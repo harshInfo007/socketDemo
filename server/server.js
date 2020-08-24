@@ -18,6 +18,7 @@ io.on('connection', (socket) => {
 })
   socket.on('createEmail', (obj) => {
     console.log(obj)
+    io.emit('newMessage',obj)
   })
 
   socket.emit('newEmail', {
