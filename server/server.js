@@ -16,6 +16,16 @@ io.on('connection', (socket) => {
   socket.on('disconnect', () => {
     console.log('disconnected from server to client')
 })
+  socket.on('createEmail', (obj) => {
+    console.log(obj)
+  })
+
+  socket.emit('newEmail', {
+    from: 'harsh@gmail.com',
+    to: 'abc@gmail.com',
+    text: 'table'
+  });
+
   console.log(`new user connected`)});
 app.get('/', (req, res) => {
     res.send('Hello World!')
