@@ -15,15 +15,26 @@ app.use(express.static(publicPath))
 io.on('connection', (socket) => {
   socket.on('disconnect', () => {
     console.log('disconnected from server to client')
-})
+  })
   socket.on('createEmail', (obj) => {
     console.log(obj)
   })
 
   socket.on('createMessage', (obj) => {
     console.log(obj)
-    io.emit('newMessage',obj)
+    // io.emit('newMessage',obj)
+    socket.broadcast.emit('newMessage',obj)
   })
+
+  socket.emit('newMessage', {
+    from: 'Admin',
+    text: 'Welcome to my place'
+  });
+
+  socket.broadcast.emit('newMessage', {
+    from: 'Admin',
+    text: 'New user has joined our group please greet him'
+  });
 
   socket.emit('newEmail', {
     from: 'harsh@gmail.com',
