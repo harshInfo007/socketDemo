@@ -5,6 +5,8 @@ const app = express()
 const port = process.env.PORT || 3000
 const SocketIO = require('socket.io')
 
+const { generateMessage } = './utils/message.js';
+
 const publicPath = path.join(__dirname, ".." , "public");
 
 const server = http.createServer(app);
@@ -26,15 +28,12 @@ io.on('connection', (socket) => {
     socket.broadcast.emit('newMessage',obj)
   })
 
-  socket.emit('newMessage', {
-    from: 'Admin',
-    text: 'Welcome to my place'
-  });
+  socket.emit('newMessage', generateMessage('Admin', 'Welcome to my place'));
 
-  socket.broadcast.emit('newMessage', {
-    from: 'Admin',
-    text: 'New user has joined our group please greet him'
-  });
+  socket.broadcast.emit('newMessage', generateMessage(
+    'Admin',
+    'New user has joined our group please greet him'
+  ));
 
   socket.emit('newEmail', {
     from: 'harsh@gmail.com',
