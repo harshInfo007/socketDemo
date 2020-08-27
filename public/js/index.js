@@ -25,6 +25,21 @@ socket.on('disconnect',function () {
     console.log('disconnected to server from client')
 });
 
+function scrollToBottom() {
+    var message = jQuery('#messages');
+    var newMessage = message.children('li:last-child');
+    //heights
+    var clientHeight = message.prop('clientHeight');
+    var scrollTop = message.prop('scrollTop');
+    var scrollHeight = message.prop('scrollHeight');
+    var newMessageHeight = newMessage.innerHeight();
+    var lastMessageHeight = message.prev.innerHeight();
+
+    if(clientHeight  + scrollTop + newMessageHeight + lastMessageHeight >= scrollHeight){
+        console.log('Should scroll');
+    }
+}
+
 
 jQuery('#message-form').on('submit', function (e){
     e.preventDefault();
@@ -42,6 +57,7 @@ jQuery('#message-form').on('submit', function (e){
             createdAt,
             text: obj.text
         })
+        scrollToBottom();
         jQuery('#messages').append(html);
     })
     console.log('createmessage')
@@ -67,6 +83,7 @@ locBtn.on('click', function (e){
                     url: `https://www.google.com/maps?q=${message.lat},${message.long}`
                 })
                 locBtn.removeAttr('disabled')
+                scrollToBottom();
                 jQuery('#messages').append(html);
             })
         }, function (error) {
