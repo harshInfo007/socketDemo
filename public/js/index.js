@@ -28,14 +28,21 @@ socket.on('disconnect',function () {
 
 jQuery('#message-form').on('submit', function (e){
     e.preventDefault();
+    
+    var template = jQuery('#message-template').html();
+    
     socket.emit('createMessage',{
         from:"user",
         text: jQuery('[name=message]').val()
     },(obj) => {
         console.log(`${obj.from}: ${obj.text}`)
-        var li = jQuery('<li></li>');
-        li.text=`${obj.from}: ${obj.text}`
-        jQuery('#messages').append(`<li>${obj.from} ${moment(obj.createdAt).format('hh:mm a')}: ${obj.text}</li>`);
+        var createdAt = moment(obj.createdAt).format('hh:mm a');
+        var html = Mustache.render(template,{
+            from: obj.from,
+            createdAt,
+            text: obj.text
+        })
+        jQuery('#messages').append(html);
     })
     console.log('createmessage')
 })
@@ -43,6 +50,7 @@ jQuery('#message-form').on('submit', function (e){
 const locBtn = jQuery('#send-location');
 locBtn.on('click', function (e){
     e.preventDefault();
+    var template = jQuery('#location-message-template').html();
     if(!navigator.geolocation) {
         alert('Geolocation is not supported by your browser');
       } else {
@@ -52,8 +60,14 @@ locBtn.on('click', function (e){
                 lat: position.coords.latitude,
                 long: position.coords.longitude,
             }, (message) => {
+                var createdAt = moment(message.createdAt).format('hh:mm a');
+                var html = Mustache.render(template,{
+                    from: message.from,
+                    createdAt,
+                    url: `https://www.google.com/maps?q=${message.lat},${message.long}`
+                })
                 locBtn.removeAttr('disabled')
-                jQuery('#messages').append(`<li>${message.from} ${moment(message.createdAt).format('hh:mm a')}: We will sync with u at lat-${message.lat}  long-${message.long}<br> <a target="_blank" href="https://www.google.com/maps?q=${message.lat},${message.long}">my location</a></li>`);
+                jQuery('#messages').append(html);
             })
         }, function (error) {
             locBtn.removeAttr('disable')
