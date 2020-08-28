@@ -33,10 +33,10 @@ function scrollToBottom() {
     var scrollTop = message.prop('scrollTop');
     var scrollHeight = message.prop('scrollHeight');
     var newMessageHeight = newMessage.innerHeight();
-    var lastMessageHeight = message.prev.innerHeight();
+    var lastMessageHeight = newMessage.prev().innerHeight();
 
     if(clientHeight  + scrollTop + newMessageHeight + lastMessageHeight >= scrollHeight){
-        console.log('Should scroll');
+        message.scrollTop(scrollHeight);
     }
 }
 
@@ -57,8 +57,8 @@ jQuery('#message-form').on('submit', function (e){
             createdAt,
             text: obj.text
         })
-        scrollToBottom();
         jQuery('#messages').append(html);
+        scrollToBottom();
     })
     console.log('createmessage')
 })
@@ -82,9 +82,9 @@ locBtn.on('click', function (e){
                     createdAt,
                     url: `https://www.google.com/maps?q=${message.lat},${message.long}`
                 })
-                locBtn.removeAttr('disabled')
-                scrollToBottom();
+                locBtn.removeAttr('disabled');
                 jQuery('#messages').append(html);
+                scrollToBottom();
             })
         }, function (error) {
             locBtn.removeAttr('disable')

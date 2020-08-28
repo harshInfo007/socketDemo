@@ -4,28 +4,22 @@
     <head>
         <meta charset="utf-8"> 
         <link rel="stylesheet" href="css/styles.css" />
-        <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
-        <title> JOIN | CHAT APP</title>
+        <title> Chat app</title>
     </head>
 
-    <body class="centered-form">
-        <div class="centered-form__form">
-            <form action="./chat.html">
-                <div class="form-field">
-                    <h3> Join a room</h3>
-                </div>
-                <div class="form-field">
-                    <label>Display Name</label>
-                    <input type="text" name="name" autofocus>
-                </div>
-                <div class="form-field">
-                    <label>Room Name</label>
-                    <input type="text" name="room">
-                </div>
-                <div class="form-field">
-                    <button>Join</button>
-                </div>
-            </form>
+    <body class="chat">
+        <div class="chat__sidebar">
+            <h3>People</h3>
+        </div>
+        <div class="chat__main">
+            <ol id="messages" class="chat__messages"></ol>
+            <div class="chat__footer">
+                <form id="message-form">
+                    <input type="text" name="message" placeholder="Message" autofocus autocomplete/>
+                    <button type="submit" id="message-button">Send</button>
+                    <button id="send-location">Send location</button>
+                </form>
+            </div>
         </div>
 
         <script id="message-template" type="text/template">
