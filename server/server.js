@@ -73,12 +73,12 @@ io.on('connection', (socket) => {
       callback('name & display name is required property')
     }
     users.removeUser(socket.id);
-    users.addUser(socket.id, obj.name, obj.room);
-    console.log('final users', users.getUsersList(obj.room))
+    users.addUser(socket.id, obj.name, obj.room.toLowerCase());
+    console.log('final users', users.getUsersList(obj.room.toLowerCase()))
     socket.join(obj.room.toLowerCase());
-    io.in(obj.room).emit('updateUserList', users.getUsersList(obj.room))
+    io.in(obj.room.toLowerCase()).emit('updateUserList', users.getUsersList(obj.room.toLowerCase()))
     socket.emit('newMessage', generateMessage('Admin', `Welcome to room: ${obj.room}`))
-    socket.broadcast.to(obj.room).emit('newMessage', generateMessage('Admin', `${obj.name} has joined our ${obj.room} room`))
+    socket.broadcast.to(obj.room.toLowerCase()).emit('newMessage', generateMessage('Admin', `${obj.name} has joined our ${obj.room} room`))
     callback()
   })
 
@@ -87,7 +87,7 @@ io.on('connection', (socket) => {
     // io.emit('newMessage',obj)
     const user = users.getUser(socket.id);
     var newObj = {...obj,from: user.name , createdAt: moment().valueOf()};
-    socket.to(user.room).broadcast.emit('newLocationMessage',newObj)
+    socket.to(user.room.toLowerCase()).broadcast.emit('newLocationMessage',newObj)
     callback(newObj);
   })
 
@@ -97,15 +97,15 @@ io.on('connection', (socket) => {
     console.log(user, obj)
     // io.emit('newMessage',obj)
     var newObj = {text: obj.text,from: user.name , createdAt: moment().valueOf()};
-    socket.to(user.room).emit('newMessage',newObj)
+    socket.to(user.room.toLowerCase()).emit('newMessage',newObj)
     callback(newObj);
   })
 
   socket.on('disconnect', () => {
     var user = users.removeUser(socket.id);
     if(user){
-      io.to(user.room).emit('updateUserList', users.getUsersList(user.room))
-      io.to(user.room).emit('newMessage', generateMessage(
+      io.to(user.room.toLowerCase()).emit('updateUserList', users.getUsersList(user.room.toLowerCase()))
+      io.to(user.room.toLowerCase()).emit('newMessage', generateMessage(
         'Admin',
         `${user.name} has left the group.`
       ))
