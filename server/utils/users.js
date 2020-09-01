@@ -1,4 +1,4 @@
-class Person {
+class Users {
     constructor() {
         this.users = [];
     }
@@ -10,14 +10,17 @@ class Person {
     addUser(id, name, room){
         var user = { id, name, room};
         this.users.push(user);
+        console.log(this.users)
         return user;
     }
 
     removeUser(id){
         var user = this.getUser(id);
         if(user){
-            this.users = this.users.filter(objUser => objUser.id == id);
+            this.users = this.users.filter(objUser => objUser.id != id);
         }
+        console.log('removed user', user,this.users)
+        return user
     }
 
     getUsersList(room){
@@ -27,4 +30,6 @@ class Person {
     }
 }
 
-var me = new Person();
+module.exports = {
+    Users
+}

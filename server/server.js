@@ -6,11 +6,13 @@ const { isRealString } = require('./utils/validation')
 const app = express()
 const port = process.env.PORT || 3000
 const SocketIO = require('socket.io')
+const { Users } = require('./utils/users');
 // var jsdom = require("jsdom");
 // const { JSDOM } = jsdom;
 // const { window } = new JSDOM();
 // const jQuery = require('jquery')(process.window);
 const { generateMessage } = require('./utils/message');
+const users = new Users()
 
 const publicPath = path.join(__dirname, ".." , "public");
 
@@ -65,47 +67,46 @@ app.use(express.static(publicPath))
 //   console.log(`new user connected`)});
 
 io.on('connection', (socket) => {
-  socket.on('disconnect', () => {
-    console.log('disconnected from server to client')
-  })
-
-  socket.on('createMessage', (obj,callback) => {
-    console.log(obj)
-    // io.emit('newMessage',obj)
-    socket.broadcast.emit('newMessage',{...obj, createdAt: moment().valueOf()})
-    callback(obj);
-  })
 
   socket.on('join', (obj,callback) => {
     if(!isRealString(obj.name) || !isRealString(obj.room)){
       callback('name & display name is required property')
     }
-    console.log("server",obj)
+    users.removeUser(socket.id);
+    users.addUser(socket.id, obj.name, obj.room);
+    console.log('final users', users.getUsersList(obj.room))
     socket.join(obj.room);
+    io.in(obj.room).emit('updateUserList', users.getUsersList(obj.room))
     socket.emit('newMessage', generateMessage('Admin', `Welcome to room: ${obj.room}`))
-    socket.broadcast.to(obj.room).emit('newMessage', generateMessage('Admin', `${obj.name} has joined`))
+    socket.broadcast.to(obj.room).emit('newMessage', generateMessage('Admin', `${obj.name} has joined our ${obj.room} room`))
     callback()
   })
 
   socket.on('createLocationMessage', (obj,callback) => {
     console.log(obj)
     // io.emit('newMessage',obj)
-    socket.broadcast.to(obj.room).emit('newMessage',{...obj, from: 'Admin', createdAt: moment().valueOf()})
+    socket.to(obj.room).broadcast.to(obj.room).emit('newMessage',{...obj, from: 'Admin', createdAt: moment().valueOf()})
     callback({...obj, from: 'Admin'});
   })
 
-  socket.broadcast.emit('newMessage', generateMessage(
-    'Admin',
-    'New user has joined our group please greet him'
-  ));
+  socket.on('createMessage', (obj,callback) => {
+    console.log(obj)
+    // io.emit('newMessage',obj)
+    socket.to(obj.room).broadcast.emit('newMessage',{...obj, createdAt: moment().valueOf()})
+    callback(obj);
+  })
 
-  socket.emit('newEmail', {
-    from: 'harsh@gmail.com',
-    to: 'abc@gmail.com',
-    text: 'table'
-  });
-
-  console.log(`new user connected`)});
+  socket.on('disconnect', () => {
+    var user = users.removeUser(socket.id);
+    if(user){
+      io.to(user.room).emit('updateUserList', users.getUsersList(user.room))
+      io.to(user.room).emit('newMessage', generateMessage(
+        'Admin',
+        `${user.name} has left the group.`
+      ))
+    }
+  })
+});
   
   app.get('/', (req, res) => {
     res.send('Hello World!')

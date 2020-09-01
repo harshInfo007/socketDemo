@@ -10,6 +10,9 @@
     <body class="chat">
         <div class="chat__sidebar">
             <h3>People</h3>
+            <div>
+                <ol id="users"> </ol>
+            </div>
         </div>
         <div class="chat__main">
             <ol id="messages" class="chat__messages"></ol>
@@ -21,6 +24,12 @@
                 </form>
             </div>
         </div>
+
+        <script id="users-template" type="text/template">
+            <li>
+                {{name}}
+            </li>
+        </script>
 
         <script id="message-template" type="text/template">
             <li class="message">

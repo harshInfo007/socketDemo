@@ -1,5 +1,4 @@
 var socket = io();
-// var moment = require('./libs/moment')
 
 socket.on('connect', function () {
     console.log('connected to server from client')
@@ -24,6 +23,16 @@ for(var value of params.keys()) {
     }, (message) => {
         console.log(message);
     })
+});
+
+socket.on('updateUserList', function (arrOfUsers) {
+    console.log(`abcåßnewMessage ${JSON.stringify(arrOfUsers)}`)
+    var template = jQuery('#users-template').html();
+
+    var arrOfHtml = arrOfUsers.map(objUser =>  Mustache.render(template,{
+        name: objUser,
+    }))
+    jQuery('#users').html(arrOfHtml);
 });
 
 socket.on('newEmail', function (obj) {
