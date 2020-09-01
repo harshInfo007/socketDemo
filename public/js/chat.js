@@ -2,7 +2,7 @@ var socket = io();
 
 socket.on('connect', function () {
     console.log('connected to server from client')
-debugger
+
 const params = new URLSearchParams(window.location.search);
 let paramObj = {};
 for(var value of params.keys()) {
@@ -26,7 +26,6 @@ for(var value of params.keys()) {
 });
 
 socket.on('updateUserList', function (arrOfUsers) {
-    console.log(`abcåßnewMessage ${JSON.stringify(arrOfUsers)}`)
     var template = jQuery('#users-template').html();
 
     var arrOfHtml = arrOfUsers.map(objUser =>  Mustache.render(template,{
@@ -51,6 +50,20 @@ socket.on('newMessage', function (obj) {
         })
         jQuery('#messages').append(html);
         scrollToBottom();
+});
+
+socket.on('newLocationMessage', function (obj) {
+    console.log(`newMessage ${JSON.stringify(obj)}`)
+    var template = jQuery('#location-message-template').html();
+    var createdAt = moment(obj.createdAt).format('hh:mm a');
+    var html = Mustache.render(template,{
+        from: obj.from,
+        createdAt,
+        url: `https://www.google.com/maps?q=${obj.lat},${obj.long}`
+    })
+    locBtn.removeAttr('disabled');
+    jQuery('#messages').append(html);
+    scrollToBottom();
 });
 
 socket.on('disconnect',function () {
@@ -79,7 +92,6 @@ jQuery('#message-form').on('submit', function (e){
     var template = jQuery('#message-template').html();
     
     socket.emit('createMessage',{
-        from:"user",
         text: jQuery('[name=message]').val()
     },(obj) => {
         console.log(`${obj.from}: ${obj.text}`)

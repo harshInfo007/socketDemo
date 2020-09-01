@@ -85,15 +85,20 @@ io.on('connection', (socket) => {
   socket.on('createLocationMessage', (obj,callback) => {
     console.log(obj)
     // io.emit('newMessage',obj)
-    socket.to(obj.room).broadcast.to(obj.room).emit('newMessage',{...obj, from: 'Admin', createdAt: moment().valueOf()})
-    callback({...obj, from: 'Admin'});
+    const user = users.getUser(socket.id);
+    var newObj = {...obj,from: user.name , createdAt: moment().valueOf()};
+    socket.to(user.room).broadcast.emit('newLocationMessage',newObj)
+    callback(newObj);
   })
 
   socket.on('createMessage', (obj,callback) => {
     console.log(obj)
+    const user = users.getUser(socket.id);
+    console.log(user, obj)
     // io.emit('newMessage',obj)
-    socket.to(obj.room).broadcast.emit('newMessage',{...obj, createdAt: moment().valueOf()})
-    callback(obj);
+    var newObj = {text: obj.text,from: user.name , createdAt: moment().valueOf()};
+    socket.to(user.room).emit('newMessage',newObj)
+    callback(newObj);
   })
 
   socket.on('disconnect', () => {
