@@ -75,7 +75,7 @@ io.on('connection', (socket) => {
     users.removeUser(socket.id);
     users.addUser(socket.id, obj.name, obj.room);
     console.log('final users', users.getUsersList(obj.room))
-    socket.join(obj.room);
+    socket.join(obj.room.toLowerCase());
     io.in(obj.room).emit('updateUserList', users.getUsersList(obj.room))
     socket.emit('newMessage', generateMessage('Admin', `Welcome to room: ${obj.room}`))
     socket.broadcast.to(obj.room).emit('newMessage', generateMessage('Admin', `${obj.name} has joined our ${obj.room} room`))
