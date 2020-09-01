@@ -3,7 +3,20 @@ var socket = io();
 
 socket.on('connect', function () {
     console.log('connected to server from client')
-
+debugger
+const params = new URLSearchParams(window.location.search);
+let paramObj = {};
+for(var value of params.keys()) {
+     paramObj[value] = params.get(value);
+ }
+    
+    console.log(params, paramObj)
+    socket.emit('join', paramObj, (err) => {
+        if(err) {
+            window.alert(err)
+            window.location.href = '/'
+        }
+    })
     socket.emit('createEmail', {
         from: 'abc@email.com',
         to: '12@gmail.com',
@@ -19,6 +32,16 @@ socket.on('newEmail', function (obj) {
 
 socket.on('newMessage', function (obj) {
     console.log(`newMessage ${JSON.stringify(obj)}`)
+    var template = jQuery('#message-template').html();
+    console.log(`${obj.from}: ${obj.text}`)
+        var createdAt = moment(obj.createdAt).format('hh:mm a');
+        var html = Mustache.render(template,{
+            from: obj.from,
+            createdAt,
+            text: obj.text
+        })
+        jQuery('#messages').append(html);
+        scrollToBottom();
 });
 
 socket.on('disconnect',function () {
